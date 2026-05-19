@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f1e3a">
+<meta name="description" content="The interactive companion to The Lifestyle Audit. Discover how much your household quietly loses each year — and how much you can recover.">
+<title>The Lifestyle Audit — Interactive Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f1e3a;
+    --navy-soft: #1c2d4f;
+    --navy-deep: #091428;
+    --ivory: #f5efe2;
+    --ivory-warm: #ede5d1;
+    --cream: #faf6ea;
+    --gold: #c9a961;
+    --gold-soft: #e9d9a8;
+    --gold-pale: #f5ecd0;
+    --rust: #a8472a;
+    --rust-soft: #f0d9cf;
+    --sage: #4a6b5e;
+    --sage-soft: #dde6e0;
+    --rule: #d4c7a8;
+    --rule-soft: #e5dcc0;
+    --muted: #6e6450;
+    --ink: #1a1a1a;
+    --shadow-sm: 0 1px 2px rgba(15,30,58,0.04);
+    --shadow: 0 2px 4px rgba(15,30,58,0.04), 0 8px 24px rgba(15,30,58,0.07);
+    --shadow-lg: 0 1px 2px rgba(15,30,58,0.06), 0 16px 48px rgba(15,30,58,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--ivory);
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(201,169,97,0.06) 0%, transparent 42%),
+      radial-gradient(circle at 88% 82%, rgba(15,30,58,0.04) 0%, transparent 40%);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.32;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 0.4 0 0 0 0 0.35 0 0 0 0 0.22 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1, h2, h3, h4 { font-family: 'Playfair Display', Georgia, serif; font-weight: 500; letter-spacing: -0.015em; line-height: 1.18; color: var(--navy); }
+
+  /* Topbar */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(245,239,226,0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--rule);
+  }
+  .topbar-inner {
+    max-width: 1100px; margin: 0 auto;
+    padding: 16px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .brand-mark {
+    width: 38px; height: 38px;
+    background: var(--navy); color: var(--cream);
+    display: grid; place-items: center;
+    font-family: 'Playfair Display', serif; font-weight: 600;
+    font-size: 20px; border-radius: 2px; position: relative;
+  }
+  .brand-mark::after {
+    content: ''; position: absolute;
+    bottom: -3px; right: -3px;
+    width: 9px; height: 9px;
+    background: var(--gold); transform: rotate(45deg);
+  }
+  .brand-text { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 500; }
+  .brand-text em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .topbar-meta { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; }
+
+  /* Hero */
+  .hero {
+    padding: 70px 28px 36px;
+    max-width: 900px; margin: 0 auto;
+    text-align: center;
+    position: relative; z-index: 2;
+  }
+  .hero-eyebrow {
+    color: var(--gold); font-size: 11px;
+    letter-spacing: 0.32em; margin-bottom: 22px;
+    display: inline-flex; align-items: center; gap: 18px;
+    font-weight: 500;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after {
+    content: ''; width: 36px; height: 1px; background: var(--gold);
+  }
+  .hero h1 {
+    font-size: clamp(34px, 6vw, 64px);
+    font-weight: 400;
+    margin-bottom: 22px;
+    line-height: 1.0;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .hero-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--navy-soft);
+    max-width: 620px; margin: 0 auto 28px;
+    line-height: 1.5;
+  }
+  .hero-intro {
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 22px 28px;
+    margin-top: 24px;
+    max-width: 640px;
+    margin-left: auto; margin-right: auto;
+    text-align: left;
+  }
+  .hero-intro .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.22em;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .hero-intro p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--ink);
+    margin: 0;
+  }
+  .hero-intro p + p { margin-top: 10px; }
+
+  /* Main container */
+  .main {
+    max-width: 1100px;
+    margin: 40px auto 80px;
+    padding: 0 28px;
+    position: relative; z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* Section navigation */
+  .section-nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    padding: 12px;
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+  }
+  .nav-pill {
+    padding: 8px 14px;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--navy-soft);
+    transition: all 0.15s;
+    user-select: none;
+    font-weight: 500;
+  }
+  .nav-pill:hover { border-color: var(--gold); color: var(--navy); }
+  .nav-pill.completed {
+    background: var(--sage-soft);
+    border-color: var(--sage);
+    color: var(--sage);
+  }
+  .nav-pill.completed::before { content: '✓ '; }
+
+  /* Audit sections */
+  .section {
+    background: var(--cream);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 28px 30px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+  }
+  .section-header {
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.22em;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .section h2 {
+    font-size: 22px;
+    color: var(--navy);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+  .section h2 em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .section-desc {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* Audit items */
+  .audit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    transition: background 0.15s;
+  }
+  .audit-item:last-child { border-bottom: none; }
+  .audit-item:hover { background: rgba(201,169,97,0.04); }
+
+  .audit-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    border: 2px solid var(--rule);
+    border-radius: 4px;
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 1px;
+    position: relative;
+    background: white;
+    transition: all 0.15s;
+  }
+  .audit-item input[type="checkbox"]:checked {
+    background: var(--navy);
+    border-color: var(--navy);
+  }
+  .audit-item input[type="checkbox"]:checked::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 1px;
+    width: 6px; height: 12px;
+    border: solid var(--gold);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .audit-content { flex: 1; min-width: 0; }
+  .audit-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    margin-right: 6px;
+  }
+  .audit-text {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .audit-leak {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 3px 9px;
+    background: var(--rust-soft);
+    color: var(--rust);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    border-radius: 2px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .audit-item.checked .audit-text { color: var(--muted); }
+  .audit-item.checked .audit-leak { background: var(--gold-pale); color: #8a6b1a; }
+
+  /* Sidebar (results) */
+  .sidebar {
+    position: sticky;
+    top: 90px;
+  }
+  .results-card {
+    background: var(--navy);
+    color: var(--cream);
+    border-radius: 4px;
+    padding: 28px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+  }
+  .results-card::before {
+    content: '';
+    position: absolute;
+    top: -20px; right: -20px;
+    width: 120px; height: 120px;
+    background: linear-gradient(135deg, transparent 50%, var(--gold) 50%);
+    opacity: 0.15;
+  }
+  .results-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    margin-bottom: 14px;
+    font-weight: 600;
+    position: relative;
+  }
+  .results-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--cream);
+    margin-bottom: 6px;
+    position: relative;
+  }
+  .results-num em { color: var(--gold); font-style: italic; }
+  .results-sub {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: rgba(245,239,226,0.78);
+    line-height: 1.5;
+    position: relative;
+  }
+
+  .results-divider {
+    border: none;
+    border-top: 1px solid rgba(201,169,97,0.2);
+    margin: 22px 0;
+  }
+
+  .results-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    font-size: 13px;
+    color: rgba(245,239,226,0.85);
+    border-bottom: 1px dashed rgba(201,169,97,0.15);
+  }
+  .results-stat:last-of-type { border-bottom: none; }
+  .results-stat .val {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .results-projection {
+    background: rgba(201,169,97,0.08);
+    border-left: 3px solid var(--gold);
+    padding: 16px 18px;
+    margin-top: 20px;
+    border-radius: 2px;
+    position: relative;
+  }
+  .results-projection .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .results-projection .num {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--cream);
+    line-height: 1.1;
+  }
+  .results-projection .desc {
+    font-size: 12px;
+    color: rgba(245,239,226,0.7);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  /* Action buttons */
+  .actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: all 0.15s;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .btn-primary:hover {
+    background: var(--gold-soft);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(245,239,226,0.3);
+  }
+  .btn-secondary:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Top results banner (mobile) */
+  .mobile-results {
+    display: none;
+  }
+
+  /* Privacy note */
+  .privacy {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: var(--ivory-warm);
+    border-radius: 3px;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.5;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .privacy::before { content: '🔒'; font-size: 14px; flex-shrink: 0; }
+
+  /* Footer */
+  .footer {
+    border-top: 1px solid var(--rule);
+    padding: 50px 28px 60px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12.5px;
+    position: relative; z-index: 2;
+    background: var(--ivory-warm);
+  }
+  .footer-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--navy);
+    max-width: 480px;
+    margin: 0 auto 18px;
+    line-height: 1.45;
+  }
+  .footer .disclaimer {
+    max-width: 620px;
+    margin: 18px auto 0;
+    font-size: 11.5px;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+  .footer a { color: var(--navy); text-decoration: underline; }
+
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .main {
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      padding: 0 24px;
+    }
+    .hero { padding: 60px 24px 32px; }
+    .section { padding: 24px 26px; }
+  }
+
+  /* Mobile */
+  @media (max-width: 840px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    .mobile-results {
+      display: block;
+      background: var(--navy);
+      color: var(--cream);
+      padding: 18px 22px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 70px;
+      z-index: 10;
+    }
+    .mobile-results .label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--gold);
+      letter-spacing: 0.18em;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .mobile-results .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 500;
+    }
+    .mobile-results .num em { color: var(--gold); font-style: italic; }
+    .sidebar .results-card { margin-top: 24px; }
+    .hero { padding: 50px 22px 28px; }
+    .main { padding: 0 20px; margin-top: 24px; gap: 20px; }
+    .section { padding: 22px 24px; }
+    .topbar-inner { padding: 14px 20px; }
+    .topbar-meta { display: none; }
+    .hero h1 { font-size: clamp(28px, 7vw, 44px); }
+    .hero-sub { font-size: 15px; padding: 0 8px; }
+    .hero-intro { padding: 18px 20px; }
+    .hero-intro p { font-size: 13.5px; }
+    .section-nav {
+      gap: 6px;
+      padding: 10px;
+    }
+    .nav-pill {
+      padding: 8px 12px;
+      font-size: 11.5px;
+    }
+    .section h2 { font-size: 20px; }
+    .audit-text { font-size: 14.5px; line-height: 1.5; }
+    .audit-leak { font-size: 11px; padding: 3px 8px; }
+  }
+
+  @media (max-width: 480px) {
+    body { font-size: 15px; }
+    .hero { padding: 40px 18px 24px; }
+    .hero h1 { font-size: 30px; line-height: 1.05; }
+    .hero-sub { font-size: 14.5px; }
+    .hero-intro { padding: 16px 18px; margin-top: 20px; }
+    .hero-intro p { font-size: 13px; line-height: 1.6; }
+    .hero-intro p + p { margin-top: 8px; }
+
+    .main { padding: 0 14px; gap: 16px; }
+    .section { padding: 18px 18px; margin-bottom: 16px; }
+    .section-header { margin-bottom: 18px; padding-bottom: 14px; }
+    .section h2 { font-size: 19px; line-height: 1.2; }
+    .section-desc { font-size: 12.5px; }
+
+    .audit-item {
+      padding: 14px 0;
+      gap: 12px;
+    }
+    .audit-item input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+    }
+    .audit-item input[type="checkbox"]:checked::after {
+      left: 6px;
+      top: 2px;
+      width: 6px;
+      height: 12px;
+    }
+    .audit-text {
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .audit-num {
+      font-size: 9.5px;
+      margin-right: 4px;
+    }
+    .audit-leak {
+      font-size: 10.5px;
+      padding: 3px 7px;
+      margin-top: 5px;
+    }
+
+    .section-nav {
+      gap: 5px;
+      padding: 8px;
+    }
+    .nav-pill {
+      font-size: 11px;
+      padding: 7px 10px;
+    }
+
+    .mobile-results {
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .mobile-results .label { font-size: 9px; letter-spacing: 0.16em; }
+    .mobile-results .num { font-size: 26px; }
+
+    .results-card { padding: 22px 22px; }
+    .results-num { font-size: 36px; }
+    .results-projection .num { font-size: 22px; }
+    .results-label { font-size: 9px; letter-spacing: 0.18em; }
+    .results-sub { font-size: 12.5px; }
+
+    .topbar-inner { padding: 12px 16px; }
+    .brand-mark { width: 32px; height: 32px; font-size: 17px; }
+    .brand-text { font-size: 16px; }
+
+    .footer { padding: 36px 20px 48px; }
+    .footer-quote { font-size: 16px; }
+    .footer .disclaimer { font-size: 11px; }
+  }
+
+  /* Very small (iPhone SE size) */
+  @media (max-width: 360px) {
+    .hero h1 { font-size: 26px; }
+    .nav-pill { font-size: 10.5px; padding: 7px 9px; }
+    .audit-text { font-size: 13.5px; }
+    .section { padding: 16px 14px; }
+    .main { padding: 0 10px; }
+  }
+
+  /* iOS fixes */
+  @supports (-webkit-touch-callout: none) {
+    input, select, textarea { font-size: 16px; }
+  }
+  @media (hover: none) and (pointer: coarse) {
+    .audit-item input[type="checkbox"] { width: 26px; height: 26px; }
+    .nav-pill, .btn { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  }
+  html, body { overflow-x: hidden; max-width: 100vw; }
+
+  a:focus-visible, button:focus-visible, input:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">Q</div>
+      <div class="brand-text">The Lifestyle <em>Audit</em></div>
+    </div>
+    <div class="topbar-meta">INTERACTIVE TOOL · 2026</div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-eyebrow">A COMPANION TO THE FIELD GUIDE</div>
+  <h1>How much is your<br>household <em>quietly losing</em>?</h1>
+  <p class="hero-sub">Answer 47 honest questions about your spending. In about ten minutes, you'll see — in real dollars — what the leaks are costing you each year, and what recovering them would compound into over the next two decades.</p>
+
+  <div class="hero-intro">
+    <div class="label">HOW THIS WORKS</div>
+    <p>Check the box for every item that honestly applies to your household. Your running total updates live in the sidebar. The data stays on this device — nothing is sent anywhere, no account required.</p>
+    <p>The number this tool produces is an estimate based on the midpoint of the published ranges for each category. Your real recovery potential may be higher or lower; what matters is the order of magnitude, and the conversation it starts.</p>
+  </div>
+</section>
+
+<main class="main">
+  <div>
+    <!-- Mobile results banner -->
+    <div class="mobile-results">
+      <div class="label">YOUR ANNUAL LEAK SO FAR</div>
+      <div class="num" id="mobile-total">$<em>0</em></div>
+    </div>
+
+    <!-- Section navigation -->
+    <div class="section-nav" id="section-nav">
+      <button class="nav-pill" data-target="section-a">A · Convenience</button>
+      <button class="nav-pill" data-target="section-b">B · Subscriptions</button>
+      <button class="nav-pill" data-target="section-c">C · Housing</button>
+      <button class="nav-pill" data-target="section-d">D · Transportation</button>
+      <button class="nav-pill" data-target="section-e">E · Lifestyle</button>
+      <button class="nav-pill" data-target="section-f">F · Financial</button>
+      <button class="nav-pill" data-target="section-g">G · Family</button>
+    </div>
+
+    <!-- SECTION A — CONVENIENCE -->
+    <section class="section" id="section-a">
+      <div class="section-header">
+        <div class="section-label">SECTION A</div>
+        <h2>Convenience &amp; <em>daily spending</em></h2>
+        <p class="section-desc">The small, frequent transactions that disappear from conscious attention. Often the largest single category of recoverable spending.</p>
+      </div>
+      <div class="audit-items">
+        <label class="audit-item" data-leak="5500">
+          <input type="checkbox" data-id="1">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">01</span>I use food delivery (DoorDash, Uber Eats, Grubhub) more than twice a week.</div>
+            <span class="audit-leak">$3,000 – $8,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="160">
+          <input type="checkbox" data-id="2">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">02</span>I have an active premium delivery membership (DashPass, Uber One, Instacart+) that I rarely think about.</div>
+            <span class="audit-leak">$120 – $200 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1850">
+          <input type="checkbox" data-id="3">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">03</span>I buy coffee out more than five times a week.</div>
+            <span class="audit-leak">$1,200 – $2,500 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="2250">
+          <input type="checkbox" data-id="4">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">04</span>I use ride-share for trips under two miles on a regular basis.</div>
+            <span class="audit-leak">$1,500 – $3,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1050">
+          <input type="checkbox" data-id="5">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">05</span>I order groceries delivered more than once a week without a clear time-pressure reason.</div>
+            <span class="audit-leak">$600 – $1,500 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="700">
+          <input type="checkbox" data-id="6">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">06</span>I regularly buy at airport, gas-station, or convenience-store prices when alternatives exist.</div>
+            <span class="audit-leak">$400 – $1,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="2750">
+          <input type="checkbox" data-id="7">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">07</span>I eat lunch out every workday rather than bringing food at least twice a week.</div>
+            <span class="audit-leak">$2,000 – $3,500 / yr</span>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- SECTION B — SUBSCRIPTIONS -->
+    <section class="section" id="section-b">
+      <div class="section-header">
+        <div class="section-label">SECTION B</div>
+        <h2>Subscriptions &amp; <em>recurring charges</em></h2>
+        <p class="section-desc">The single most underestimated category. Most American households spend $219 a month on subscriptions while estimating $86 — a 2.5× perception gap.</p>
+      </div>
+      <div class="audit-items">
+        <label class="audit-item" data-leak="350">
+          <input type="checkbox" data-id="8">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">08</span>I'm paying for more than three video streaming services concurrently.</div>
+            <span class="audit-leak">$200 – $500 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="150">
+          <input type="checkbox" data-id="9">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">09</span>I'm paying for a music streaming service I rarely use.</div>
+            <span class="audit-leak">$120 – $180 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="200">
+          <input type="checkbox" data-id="10">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">10</span>I'm paying for multiple cloud-storage services with overlapping use.</div>
+            <span class="audit-leak">$100 – $300 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="750">
+          <input type="checkbox" data-id="11">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">11</span>I have a gym membership I used fewer than six times last month.</div>
+            <span class="audit-leak">$300 – $1,200 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="135">
+          <input type="checkbox" data-id="12">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">12</span>I'm paying for fitness or meditation apps I haven't opened in 30 days.</div>
+            <span class="audit-leak">$70 – $200 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="700">
+          <input type="checkbox" data-id="13">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">13</span>I'm paying for professional software I no longer use (from a past job, project, or hobby).</div>
+            <span class="audit-leak">$200 – $1,200 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="360">
+          <input type="checkbox" data-id="14">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">14</span>I have at least one subscription I cannot remember actively signing up for.</div>
+            <span class="audit-leak">$120 – $600 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="350">
+          <input type="checkbox" data-id="15">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">15</span>I have annual subscriptions I used heavily for the first three months and then forgot.</div>
+            <span class="audit-leak">$200 – $500 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="300">
+          <input type="checkbox" data-id="16">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">16</span>I'm paying for premium tiers (no-ads, family plans) I don't really need.</div>
+            <span class="audit-leak">$200 – $400 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1000">
+          <input type="checkbox" data-id="17">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">17</span>I have not done a complete subscription audit in the last 12 months.</div>
+            <span class="audit-leak">$500 – $1,500 / yr</span>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- SECTION C — HOUSING -->
+    <section class="section" id="section-c">
+      <div class="section-header">
+        <div class="section-label">SECTION C</div>
+        <h2>Housing &amp; <em>large fixed expenses</em></h2>
+        <p class="section-desc">The largest single category in any household budget — and the one where small adjustments produce the biggest long-term effect.</p>
+      </div>
+      <div class="audit-items">
+        <label class="audit-item" data-leak="8000">
+          <input type="checkbox" data-id="18">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">18</span>My total housing costs (mortgage + tax + insurance + utilities) exceed 30% of my gross income.</div>
+            <span class="audit-leak">Structural strain</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="0">
+          <input type="checkbox" data-id="19">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">19</span>I've completed a kitchen, bathroom, or major home renovation in the last three years that exceeded $30,000.</div>
+            <span class="audit-leak">Sunk — flag for next decision</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="20000">
+          <input type="checkbox" data-id="20">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">20</span>I have a second home or vacation property that I use fewer than 60 days a year.</div>
+            <span class="audit-leak">$8,000 – $40,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="600">
+          <input type="checkbox" data-id="21">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">21</span>I have not reviewed my homeowner's insurance for competitive quotes in the last two years.</div>
+            <span class="audit-leak">$200 – $1,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="2500">
+          <input type="checkbox" data-id="22">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">22</span>I'm paying private mortgage insurance (PMI) because I haven't refinanced after reaching 20% equity.</div>
+            <span class="audit-leak">$1,000 – $4,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="5200">
+          <input type="checkbox" data-id="23">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">23</span>I pay for lawn care, cleaning, or home services that I could realistically do myself.</div>
+            <span class="audit-leak">$2,400 – $8,000 / yr</span>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- SECTION D — TRANSPORTATION -->
+    <section class="section" id="section-d">
+      <div class="section-header">
+        <div class="section-label">SECTION D</div>
+        <h2>Transportation</h2>
+        <p class="section-desc">After housing, often the second-largest household expense — and the one most distorted by depreciation that never appears on a statement.</p>
+      </div>
+      <div class="audit-items">
+        <label class="audit-item" data-leak="5500">
+          <input type="checkbox" data-id="24">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">24</span>I have a car payment greater than 10% of my monthly take-home pay.</div>
+            <span class="audit-leak">$3,000 – $8,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="8000">
+          <input type="checkbox" data-id="25">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">25</span>I have two cars when one (with occasional ride-share) would meet 90% of our needs.</div>
+            <span class="audit-leak">$6,000 – $10,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="3000">
+          <input type="checkbox" data-id="26">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">26</span>I'm currently leasing a vehicle.</div>
+            <span class="audit-leak">$1,000 – $5,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="0">
+          <input type="checkbox" data-id="27">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">27</span>I bought my current vehicle new rather than 3–5 years used.</div>
+            <span class="audit-leak">Sunk — flag for next purchase</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="800">
+          <input type="checkbox" data-id="28">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">28</span>I have not reviewed my auto insurance for competitive quotes in the last two years.</div>
+            <span class="audit-leak">$400 – $1,200 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="6600">
+          <input type="checkbox" data-id="29">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">29</span>I drive a luxury or premium-brand vehicle when a reliable mainstream alternative would have worked.</div>
+            <span class="audit-leak">$300 – $800 / mo premium</span>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- SECTION E — LIFESTYLE -->
+    <section class="section" id="section-e">
+      <div class="section-header">
+        <div class="section-label">SECTION E</div>
+        <h2>Lifestyle &amp; <em>status spending</em></h2>
+        <p class="section-desc">The category most influenced by social comparison — and the one where the honest test ("would I still buy this if no one could see it?") most often surfaces uncomfortable answers.</p>
+      </div>
+      <div class="audit-items">
+        <label class="audit-item" data-leak="3000">
+          <input type="checkbox" data-id="30">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">30</span>I spent more than $5,000 on clothing or accessories in the last 12 months.</div>
+            <span class="audit-leak">Review honestly</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1500">
+          <input type="checkbox" data-id="31">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">31</span>I have luxury items in my home that I've used fewer than five times in the last year.</div>
+            <span class="audit-leak">Sunk — pattern to flag</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1100">
+          <input type="checkbox" data-id="32">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">32</span>I've upgraded my phone in the last 18 months when the previous one still worked.</div>
+            <span class="audit-leak">$800 – $1,500 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="2500">
+          <input type="checkbox" data-id="33">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">33</span>I have memberships (clubs, organizations) that I use fewer than four times a year.</div>
+            <span class="audit-leak">$500 – $5,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="3000">
+          <input type="checkbox" data-id="34">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">34</span>I've taken a vacation in the last year that cost more than 5% of my annual income.</div>
+            <span class="audit-leak">Review honestly</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="3500">
+          <input type="checkbox" data-id="35">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">35</span>My spending patterns are primarily driven by what my peers spend.</div>
+            <span class="audit-leak">Variable, usually large</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1500">
+          <input type="checkbox" data-id="36">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">36</span>I regularly purchase items because of how they'll be seen on social media.</div>
+            <span class="audit-leak">Variable</span>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- SECTION F — FINANCIAL -->
+    <section class="section" id="section-f">
+      <div class="section-header">
+        <div class="section-label">SECTION F</div>
+        <h2>Financial <em>structure</em></h2>
+        <p class="section-desc">Not "spending" exactly — but structural patterns that leak wealth in less visible ways. Often the highest-leverage fixes in the entire audit.</p>
+      </div>
+      <div class="audit-items">
+        <label class="audit-item" data-leak="4500">
+          <input type="checkbox" data-id="37">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">37</span>I'm carrying credit card debt month-to-month.</div>
+            <span class="audit-leak">$1,500 – $8,000 in interest</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="0">
+          <input type="checkbox" data-id="38">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">38</span>I'm saving less than 20% of my gross household income.</div>
+            <span class="audit-leak">Structural under-funding</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="0">
+          <input type="checkbox" data-id="39">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">39</span>I have not increased my 401(k) contribution in the last 24 months despite a raise.</div>
+            <span class="audit-leak">Missed compounding</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="2000">
+          <input type="checkbox" data-id="40">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">40</span>I have not maxed my HSA this year (if HDHP-eligible).</div>
+            <span class="audit-leak">$1,500 – $2,500 / yr in tax</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="2000">
+          <input type="checkbox" data-id="41">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">41</span>I'm keeping more than $50,000 in a low-yield checking account.</div>
+            <span class="audit-leak">$2,000+ / yr in lost yield</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="0">
+          <input type="checkbox" data-id="42">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">42</span>I don't have automated transfers from checking to investment accounts.</div>
+            <span class="audit-leak">Behavioral leak</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1750">
+          <input type="checkbox" data-id="43">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">43</span>I have not reviewed my portfolio's expense ratios in the last 2 years.</div>
+            <span class="audit-leak">$500 – $3,000 / yr</span>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- SECTION G — FAMILY -->
+    <section class="section" id="section-g">
+      <div class="section-header">
+        <div class="section-label">SECTION G</div>
+        <h2>Children &amp; <em>family</em></h2>
+        <p class="section-desc">The category most loaded with emotion, where overspending is most often framed as "for the kids." Worth examining with particular care.</p>
+      </div>
+      <div class="audit-items">
+        <label class="audit-item" data-leak="7500">
+          <input type="checkbox" data-id="44">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">44</span>My children are enrolled in more than three paid extracurricular activities concurrently.</div>
+            <span class="audit-leak">$3,000 – $12,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="3000">
+          <input type="checkbox" data-id="45">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">45</span>I'm paying for tutoring, lessons, or programs the child has stopped engaging with.</div>
+            <span class="audit-leak">$1,200 – $5,000 / yr</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="0">
+          <input type="checkbox" data-id="46">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">46</span>I haven't opened or funded a 529 plan despite having college-bound children.</div>
+            <span class="audit-leak">Massive tax leak</span>
+          </div>
+        </label>
+        <label class="audit-item" data-leak="1750">
+          <input type="checkbox" data-id="47">
+          <div class="audit-content">
+            <div class="audit-text"><span class="audit-num">47</span>I regularly buy my children new versions of items they already have (toys, devices, clothes).</div>
+            <span class="audit-leak">$500 – $3,000 / yr</span>
+          </div>
+        </label>
+      </div>
+    </section>
+  </div>
+
+  <!-- SIDEBAR (results) -->
+  <aside class="sidebar">
+    <div class="results-card">
+      <div class="results-label">YOUR ESTIMATED ANNUAL LEAK</div>
+      <div class="results-num">$<em id="total-leak">0</em></div>
+      <div class="results-sub" id="total-sub">Check items on the left to see your number grow</div>
+
+      <hr class="results-divider">
+
+      <div class="results-stat">
+        <span>Items checked</span>
+        <span class="val"><span id="items-checked">0</span> / 47</span>
+      </div>
+      <div class="results-stat">
+        <span>Per month</span>
+        <span class="val">$<span id="per-month">0</span></span>
+      </div>
+      <div class="results-stat">
+        <span>Per week</span>
+        <span class="val">$<span id="per-week">0</span></span>
+      </div>
+
+      <div class="results-projection">
+        <div class="label">20-YEAR COMPOUND IMPACT</div>
+        <div class="num">$<span id="projection">0</span></div>
+        <div class="desc">If recovered and invested at 6% real return for 20 years</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btn-print">Save as PDF</button>
+        <button class="btn btn-secondary" id="btn-reset">Reset audit</button>
+      </div>
+    </div>
+
+    <div class="privacy">
+      Your answers stay on this device. Nothing is sent to any server. Refresh the page to start over.
+    </div>
+  </aside>
+</main>
+
+<footer class="footer">
+  <div class="footer-quote">
+    The numbers are the easy part. Seeing them clearly is the work.
+  </div>
+  <div>The Lifestyle Audit · Interactive Companion · 2026 Edition</div>
+  <div class="disclaimer">
+    This tool produces estimates based on midpoint values from the published ranges in the companion field guide. The figures reflect averages across U.S. high-earner households as documented in recent consumer research; your actual recovery potential depends on your specific situation. This is educational; it is not financial advice. For decisions that move significant money, consult a licensed CPA or fee-only fiduciary advisor.
+  </div>
+</footer>
+
+<script>
+  // ============================================================
+  // CORE STATE
+  // ============================================================
+  const auditItems = document.querySelectorAll('.audit-item');
+  const sectionNavButtons = document.querySelectorAll('.nav-pill');
+
+  // Persistent storage with safe fallback
+  const store = {
+    get(k, fb) {
+      try {
+        const v = localStorage.getItem('la:' + k);
+        return v != null ? JSON.parse(v) : fb;
+      } catch (e) { return fb; }
+    },
+    set(k, v) {
+      try { localStorage.setItem('la:' + k, JSON.stringify(v)); } catch (e) {}
+    },
+    clear() {
+      try {
+        Object.keys(localStorage).forEach(key => {
+          if (key.startsWith('la:')) localStorage.removeItem(key);
+        });
+      } catch (e) {}
+    }
+  };
+
+  // ============================================================
+  // FORMATTING
+  // ============================================================
+  function formatNum(n) {
+    if (!n || isNaN(n)) return '0';
+    return Math.round(n).toLocaleString('en-US');
+  }
+
+  function formatBig(n) {
+    if (!n || isNaN(n)) return '0';
+    if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
+    return Math.round(n).toLocaleString('en-US');
+  }
+
+  // ============================================================
+  // CORE COMPUTATION
+  // ============================================================
+  function updateTotal() {
+    let total = 0;
+    let checked = 0;
+    const sectionTotals = { 'section-a': 0, 'section-b': 0, 'section-c': 0, 'section-d': 0, 'section-e': 0, 'section-f': 0, 'section-g': 0 };
+    const sectionChecked = { 'section-a': 0, 'section-b': 0, 'section-c': 0, 'section-d': 0, 'section-e': 0, 'section-f': 0, 'section-g': 0 };
+
+    auditItems.forEach(item => {
+      const checkbox = item.querySelector('input[type="checkbox"]');
+      const leak = parseInt(item.dataset.leak) || 0;
+      const sectionId = item.closest('.section').id;
+      if (checkbox.checked) {
+        total += leak;
+        checked++;
+        item.classList.add('checked');
+        sectionTotals[sectionId] = (sectionTotals[sectionId] || 0) + leak;
+        sectionChecked[sectionId] = (sectionChecked[sectionId] || 0) + 1;
+      } else {
+        item.classList.remove('checked');
+      }
+    });
+
+    // Update main results
+    document.getElementById('total-leak').textContent = formatNum(total);
+    document.getElementById('mobile-total').innerHTML = '$<em>' + formatNum(total) + '</em>';
+    document.getElementById('items-checked').textContent = checked;
+    document.getElementById('per-month').textContent = formatNum(total / 12);
+    document.getElementById('per-week').textContent = formatNum(total / 52);
+
+    // 20-year compound at 6% real return
+    // FV of annuity: PMT * ((1+r)^n - 1)/r
+    const projection = total * ((Math.pow(1.06, 20) - 1) / 0.06);
+    document.getElementById('projection').textContent = formatBig(projection);
+
+    // Update subtitle
+    const sub = document.getElementById('total-sub');
+    if (checked === 0) {
+      sub.textContent = 'Check items on the left to see your number grow';
+    } else if (total < 5000) {
+      sub.textContent = 'A modest amount — but compounded, even this changes your trajectory';
+    } else if (total < 15000) {
+      sub.textContent = 'A meaningful annual recovery, well worth the work';
+    } else if (total < 30000) {
+      sub.textContent = 'A substantial recovery — typical of households doing this audit honestly';
+    } else if (total < 60000) {
+      sub.textContent = 'A significant amount — start with the three largest leaks';
+    } else {
+      sub.textContent = 'A large recovery available — focus on the structural items first';
+    }
+
+    // Update section pills - mark completed
+    sectionNavButtons.forEach(btn => {
+      const target = btn.dataset.target;
+      if (sectionChecked[target] > 0) {
+        btn.classList.add('completed');
+      } else {
+        btn.classList.remove('completed');
+      }
+    });
+
+    // Save state
+    const state = {};
+    auditItems.forEach(item => {
+      const id = item.querySelector('input').dataset.id;
+      const checked = item.querySelector('input').checked;
+      if (checked) state[id] = true;
+    });
+    store.set('answers', state);
+  }
+
+  // ============================================================
+  // LOAD SAVED STATE
+  // ============================================================
+  function loadState() {
+    const saved = store.get('answers', {});
+    auditItems.forEach(item => {
+      const id = item.querySelector('input').dataset.id;
+      if (saved[id]) {
+        item.querySelector('input').checked = true;
+      }
+    });
+    updateTotal();
+  }
+
+  // ============================================================
+  // BIND EVENTS
+  // ============================================================
+  auditItems.forEach(item => {
+    item.querySelector('input').addEventListener('change', updateTotal);
+  });
+
+  // Section navigation
+  sectionNavButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.target);
+      const offset = target.getBoundingClientRect().top + window.pageYOffset - 80;
+      window.scrollTo({ top: offset, behavior: 'smooth' });
+    });
+  });
+
+  // Reset
+  document.getElementById('btn-reset').addEventListener('click', () => {
+    if (!confirm('Reset all answers? This cannot be undone.')) return;
+    auditItems.forEach(item => {
+      item.querySelector('input').checked = false;
+    });
+    store.clear();
+    updateTotal();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Print / Save as PDF
+  document.getElementById('btn-print').addEventListener('click', () => {
+    window.print();
+  });
+
+  // Initialize
+  loadState();
+</script>
+
+</body>
+</html>
